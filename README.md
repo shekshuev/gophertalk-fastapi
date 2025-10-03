@@ -2,6 +2,8 @@
 
 GopherTalk is a **learning project** designed to explore the development of a lightweight social network inspired by platforms like X. This project demonstrates foundational concepts in backend development, database optimization, and performance scaling using FastAPI and PostgreSQL.
 
+Original GoLang repository: [https://github.com/shekshuev/gophertalk-backend](https://github.com/shekshuev/gophertalk-backend)
+
 ---
 
 ## 🚀 Features
@@ -10,7 +12,7 @@ GopherTalk is a **learning project** designed to explore the development of a li
 - **Posts**: Create, read, and delete posts.
 - **Likes and Views**: Track user interactions and post popularity.
 - **Optimized Database**: Utilizes techniques such as denormalization, partitioning, and replication for scalability.
-- **RESTful API**: Built with Go for high performance and simplicity.
+- **RESTful API**: Built with FastAPI for high performance and simplicity.
 
 ## 🛠️ Tech Stack
 
