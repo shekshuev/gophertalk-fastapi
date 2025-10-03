@@ -1,0 +1,28 @@
+[project]
+name = "gophertalk-fastapi"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Sergei Shekshuev",email = "sergei.shekshuev@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "psycopg[binary,pool] (>=3.2.10,<4.0.0)",
+    "fastapi (>=0.118.0,<0.119.0)",
+    "pydentic (>=0.0.1.dev3,<0.0.2)",
+    "pydantic (>=2.11.9,<3.0.0)",
+    "uvicorn (>=0.37.0,<0.38.0)"
+]
+
+[tool.poetry]
+packages = [{include = "gophertalk_fastapi", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.13.3,<0.14.0)"
+]
