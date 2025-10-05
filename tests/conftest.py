@@ -6,6 +6,7 @@ from gophertalk_fastapi.config.config import Config
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 from gophertalk_fastapi.service.auth_service import AuthService
+from gophertalk_fastapi.service.post_service import PostService
 from gophertalk_fastapi.service.user_service import UserService
 
 
@@ -147,3 +148,48 @@ def user_service(mock_user_repository, mock_config):
         UserService: A fully initialized service instance ready for testing.
     """
     return UserService(user_repository=mock_user_repository, cfg=mock_config)
+
+
+@pytest.fixture
+def mock_post_repository():
+    """
+    Provide a fully mocked `PostRepository` for service-layer testing.
+
+    This fixture defines a mock implementation of the repository with all
+    its key methods (`get_all_posts`, `create_post`, `delete_post`,
+    `view_post`, `like_post`, `dislike_post`) replaced by `MagicMock`
+    instances. It allows precise control over repository behavior,
+    including simulating database responses or raising expected exceptions
+    without requiring a real PostgreSQL connection.
+
+    Returns:
+        MagicMock: Mocked `PostRepository` object with predefined method mocks.
+    """
+    mock_repo = MagicMock()
+    mock_repo.get_all_posts = MagicMock()
+    mock_repo.create_post = MagicMock()
+    mock_repo.delete_post = MagicMock()
+    mock_repo.view_post = MagicMock()
+    mock_repo.like_post = MagicMock()
+    mock_repo.dislike_post = MagicMock()
+    return mock_repo
+
+
+@pytest.fixture
+def post_service(mock_post_repository, mock_config):
+    """
+    Provide a `PostService` instance configured for isolated unit testing.
+
+    This fixture injects a mocked `PostRepository` and mock configuration
+    to test service-layer logic independently of the database layer.
+    It is primarily used to validate that service methods correctly
+    delegate actions to the repository and handle exceptions as expected.
+
+    Args:
+        mock_post_repository (MagicMock): Mocked `PostRepository` for database access.
+        mock_config (Config): Mock configuration object with test-safe settings.
+
+    Returns:
+        PostService: Fully initialized `PostService` instance ready for testing.
+    """
+    return PostService(post_repository=mock_post_repository, cfg=mock_config)
