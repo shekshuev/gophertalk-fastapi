@@ -14,7 +14,7 @@ dependencies = [
     "pydantic (>=2.11.9,<3.0.0)",
     "uvicorn (>=0.37.0,<0.38.0)",
     "bcrypt (>=5.0.0,<6.0.0)",
-    "python-jose[cryptography] (>=3.5.0,<4.0.0)"
+    "python-jose[cryptography] (>=3.5.0,<4.0.0)",
 ]
 
 [tool.poetry]
@@ -26,5 +26,6 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "ruff (>=0.13.3,<0.14.0)"
+    "ruff (>=0.13.3,<0.14.0)",
+    "httpx (>=0.28.1,<0.29.0)"
 ]

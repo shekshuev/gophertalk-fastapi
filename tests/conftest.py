@@ -1,10 +1,12 @@
 from unittest.mock import MagicMock
 
 import pytest
+from fastapi.testclient import TestClient
 
 from gophertalk_fastapi.config.config import Config
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
+from gophertalk_fastapi.routers.auth_router import AuthRouter
 from gophertalk_fastapi.service.auth_service import AuthService
 from gophertalk_fastapi.service.post_service import PostService
 from gophertalk_fastapi.service.user_service import UserService
@@ -193,3 +195,28 @@ def post_service(mock_post_repository, mock_config):
         PostService: Fully initialized `PostService` instance ready for testing.
     """
     return PostService(post_repository=mock_post_repository, cfg=mock_config)
+
+
+@pytest.fixture
+def mock_auth_service():
+    """Provide a fully mocked AuthService with all methods pre-initialized."""
+    mock_service = MagicMock()
+    mock_service.login = MagicMock()
+    mock_service.register = MagicMock()
+    return mock_service
+
+
+@pytest.fixture
+def auth_router(mock_auth_service):
+    """Create an AuthRouter instance with a mocked AuthService."""
+    return AuthRouter(auth_service=mock_auth_service)
+
+
+@pytest.fixture
+def test_client(auth_router):
+    """Create a FastAPI TestClient using the router under test."""
+    from fastapi import FastAPI
+
+    app = FastAPI()
+    app.include_router(auth_router.router)
+    return TestClient(app)
