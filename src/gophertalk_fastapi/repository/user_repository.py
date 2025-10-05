@@ -5,16 +5,50 @@ from psycopg_pool import ConnectionPool
 from ..models.user import CreateUserDto, ReadAuthUserDataDto, ReadUserDto, UpdateUserDto
 
 
-class UserAlreadyExistsError(Exception): ...
+class UserAlreadyExistsError(Exception):
+    """
+    Raised when attempting to create a new user whose username already exists.
+
+    Typically corresponds to a `UniqueViolation` error on the `user_name` column
+    in the `users` table.
+    """
+
+    ...
 
 
-class UserNotFoundError(Exception): ...
+class UserNotFoundError(Exception):
+    """
+    Raised when a user cannot be found in the database.
+
+    This can occur when:
+      - The user ID or username does not exist.
+      - The user has been soft-deleted (`deleted_at IS NOT NULL`).
+    """
+
+    ...
 
 
-class UserRepositoryError(Exception): ...
+class UserRepositoryError(Exception):
+    """
+    General fallback exception for unexpected or unclassified database errors
+    occurring in user-related queries.
+
+    This ensures that upper layers (services, controllers) can handle all
+    repository-level failures through a unified interface.
+    """
+
+    ...
 
 
 class UserRepository:
+    """
+    Repository responsible for managing `users` and authentication-related data.
+
+    This repository provides low-level CRUD operations for user records,
+    using psycopg connection pooling and explicit SQL queries instead of an ORM.
+
+    """
+
     def __init__(self, pool: ConnectionPool):
         """
         Initialize the repository with a database connection pool.

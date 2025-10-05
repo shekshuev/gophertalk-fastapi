@@ -5,22 +5,75 @@ from psycopg_pool import ConnectionPool
 from ..models.post import CreatePostDto, FilterPostDto, ReadPostDto, ReadPostUserDto
 
 
-class ReplyToPostDoesNotExistsError(Exception): ...
+class ReplyToPostDoesNotExistsError(Exception):
+    """
+    Raised when a post creation attempt references a `reply_to_id`
+    that does not exist in the database.
+
+    Typically triggered by a `ForeignKeyViolation` in PostgreSQL
+    when the user replies to a non-existent post.
+    """
+
+    ...
 
 
-class PostNotFoundError(Exception): ...
+class PostNotFoundError(Exception):
+    """
+    Raised when a requested post cannot be found.
+
+    This may occur when:
+      - The post ID does not exist in the database.
+      - The post has been soft-deleted (i.e., `deleted_at` is not NULL).
+    """
+
+    ...
 
 
-class PostAlreadyViewedError(Exception): ...
+class PostAlreadyViewedError(Exception):
+    """
+    Raised when a user attempts to mark a post as viewed
+    but a corresponding entry in the `views` table already exists.
+    """
+
+    ...
 
 
-class PostAlreadyLikedError(Exception): ...
+class PostAlreadyLikedError(Exception):
+    """
+    Raised when a user tries to like a post that has already been liked.
+
+    Typically corresponds to a `UniqueViolation` of the primary key
+    constraint in the `likes` table (`pk__likes`).
+    """
+
+    ...
 
 
-class PostRepositoryError(Exception): ...
+class PostRepositoryError(Exception):
+    """
+    General fallback exception for unexpected database-related errors.
+
+    This exception acts as a catch-all for unclassified PostgreSQL errors,
+    providing a consistent error interface for higher-level services.
+    """
+
+    ...
 
 
 class PostRepository:
+    """
+    Repository responsible for managing `posts` and related actions.
+
+    This class provides direct database access for all post-related operations,
+    including creation, retrieval, deletion, and like/view management.
+    All database interactions are performed using `psycopg` with connection
+    pooling (`psycopg_pool.ConnectionPool`) and context managers for safety.
+
+    The repository handles both direct CRUD operations and computed data,
+    such as counts of likes, views, replies, and per-user interaction flags.
+
+    """
+
     def __init__(self, pool: ConnectionPool):
         """
         Initialize the repository with a database connection pool.

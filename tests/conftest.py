@@ -131,5 +131,19 @@ def auth_service(mock_user_repository, mock_config):
 
 @pytest.fixture
 def user_service(mock_user_repository, mock_config):
-    """Provide a UserService instance with mocked dependencies."""
+    """
+    Provide a UserService instance configured for isolated unit testing.
+
+    This fixture creates a `UserService` using mocked dependencies to
+    ensure the service logic (password hashing, user update, retrieval,
+    and deletion) can be tested independently of a real database or external
+    configuration.
+
+    Args:
+        mock_user_repository (MagicMock): Mocked UserRepository for database interaction.
+        mock_config (Config): Mock configuration with application settings.
+
+    Returns:
+        UserService: A fully initialized service instance ready for testing.
+    """
     return UserService(user_repository=mock_user_repository, cfg=mock_config)
