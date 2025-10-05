@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from gophertalk_fastapi.config.config import Config
 from gophertalk_fastapi.config.db import create_pool
+from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 
 
@@ -12,6 +13,7 @@ def create_app() -> FastAPI:
     cfg = Config()
     pool = create_pool(cfg)
     _ = UserRepository(pool)
+    _ = PostRepository(pool)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
