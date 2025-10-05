@@ -199,7 +199,18 @@ def post_service(mock_post_repository, mock_config):
 
 @pytest.fixture
 def mock_auth_service():
-    """Provide a fully mocked AuthService with all methods pre-initialized."""
+    """
+    Provide a fully mocked `AuthService` for API route testing.
+
+    This fixture creates a `MagicMock` instance that mimics the real
+    authentication service used by the application. All public methods
+    (`login`, `register`) are pre-mocked to allow fine-grained control
+    over their behavior during tests — for example, returning fake tokens
+    or raising expected exceptions without invoking real business logic.
+
+    Returns:
+        MagicMock: A mocked authentication service with preconfigured methods.
+    """
     mock_service = MagicMock()
     mock_service.login = MagicMock()
     mock_service.register = MagicMock()
@@ -208,13 +219,42 @@ def mock_auth_service():
 
 @pytest.fixture
 def auth_router(mock_auth_service):
-    """Create an AuthRouter instance with a mocked AuthService."""
+    """
+    Provide an `AuthRouter` instance bound to a mocked authentication service.
+
+    This fixture constructs the router class that defines the `/auth` API endpoints,
+    wiring it to a fake `AuthService`. It enables testing of HTTP route behavior
+    (status codes, responses, error handling) independently of real authentication logic.
+
+    Args:
+        mock_auth_service (MagicMock): A mocked service instance used by the router.
+
+    Returns:
+        AuthRouter: Router instance with routes registered and ready for inclusion in FastAPI.
+    """
     return AuthRouter(auth_service=mock_auth_service)
 
 
 @pytest.fixture
 def test_client(auth_router):
-    """Create a FastAPI TestClient using the router under test."""
+    """
+    Provide a FastAPI `TestClient` configured with the authentication router.
+
+    This fixture creates an in-memory FastAPI application, mounts the tested router,
+    and exposes a synchronous HTTP client interface for simulating requests
+    to endpoints such as `/auth/login` and `/auth/register`.
+
+    It is designed for end-to-end testing of route behavior, including:
+      - request validation via Pydantic models,
+      - HTTP status code correctness,
+      - error handling and JSON responses.
+
+    Args:
+        auth_router (AuthRouter): The router under test.
+
+    Returns:
+        TestClient: FastAPI testing client capable of issuing real HTTP calls to the in-memory app.
+    """
     from fastapi import FastAPI
 
     app = FastAPI()
