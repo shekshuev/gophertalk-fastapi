@@ -18,6 +18,6 @@ def password_validator(value: str) -> str:
 
 
 def name_validator(value: str) -> str:
-    if not re.match(r"^[\p{L}]+$", value, re.UNICODE):
+    if not value.isalpha():
         raise ValueError("Only letters allowed")
     return value
