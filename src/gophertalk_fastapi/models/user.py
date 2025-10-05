@@ -45,11 +45,15 @@ class UpdateUserDto:
     @field_validator("user_name", mode="after")
     @classmethod
     def validate_username(cls, value: str) -> str:
+        if value is None:
+            return value
         return username_validator(value)
 
     @field_validator("password", mode="after")
     @classmethod
     def validate_password(cls, value: str) -> str:
+        if value is None:
+            return value
         return password_validator(value)
 
     @field_validator("first_name", "last_name", mode="after")

@@ -7,6 +7,7 @@ from gophertalk_fastapi.config.config import Config
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 from gophertalk_fastapi.routers.auth_router import AuthRouter
+from gophertalk_fastapi.routers.user_router import UserRouter
 from gophertalk_fastapi.service.auth_service import AuthService
 from gophertalk_fastapi.service.post_service import PostService
 from gophertalk_fastapi.service.user_service import UserService
@@ -236,13 +237,57 @@ def auth_router(mock_auth_service):
 
 
 @pytest.fixture
-def test_client(auth_router):
+def mock_user_service():
+    """
+    Provide a fully mocked `UserService` for isolated router testing.
+
+    This fixture creates a `MagicMock` instance that simulates the real
+    user service used by the application. All public methods
+    (`get_all`, `get_by_id`, `update`, `delete`) are pre-initialized
+    as mocks to allow precise control over their behavior in tests.
+
+    It enables verification of HTTP route logic (status codes, validation,
+    error handling) independently from real business logic or database access.
+
+    Returns:
+        MagicMock: Mocked user service with predefined methods for testing.
+    """
+    mock_service = MagicMock()
+    mock_service.get_all = MagicMock()
+    mock_service.get_by_id = MagicMock()
+    mock_service.update = MagicMock()
+    mock_service.delete = MagicMock()
+    return mock_service
+
+
+@pytest.fixture
+def user_router(mock_user_service):
+    """
+    Provide a `UserRouter` instance bound to a mocked user service.
+
+    This fixture constructs the router responsible for `/users` API endpoints,
+    wiring it to a mocked `UserService`. It allows testing of HTTP routes for
+    listing, retrieving, updating, and deleting users without touching the
+    database or real application logic.
+
+    Args:
+        mock_user_service (MagicMock): Mocked `UserService` used by the router.
+
+    Returns:
+        UserRouter: Router instance with `/users` routes registered
+        and ready for inclusion in a FastAPI app.
+    """
+    return UserRouter(user_service=mock_user_service)
+
+
+@pytest.fixture
+def test_client(auth_router, user_router):
     """
     Provide a FastAPI `TestClient` configured with the authentication router.
 
     This fixture creates an in-memory FastAPI application, mounts the tested router,
     and exposes a synchronous HTTP client interface for simulating requests
-    to endpoints such as `/auth/login` and `/auth/register`.
+    to endpoints.
 
     It is designed for end-to-end testing of route behavior, including:
       - request validation via Pydantic models,
@@ -251,6 +296,7 @@ def test_client(auth_router):
 
     Args:
         auth_router (AuthRouter): The router under test.
+        user_router (UserRouter): The router under test.
 
     Returns:
         TestClient: FastAPI testing client capable of issuing real HTTP calls to the in-memory app.
@@ -259,4 +305,5 @@ def test_client(auth_router):
 
     app = FastAPI()
     app.include_router(auth_router.router)
+    app.include_router(user_router.router)
     return TestClient(app)

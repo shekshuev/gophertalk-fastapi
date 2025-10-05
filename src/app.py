@@ -8,6 +8,7 @@ from gophertalk_fastapi.config.db import create_pool
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 from gophertalk_fastapi.routers.auth_router import AuthRouter
+from gophertalk_fastapi.routers.user_router import UserRouter
 from gophertalk_fastapi.service.auth_service import AuthService
 from gophertalk_fastapi.service.post_service import PostService
 from gophertalk_fastapi.service.user_service import UserService
@@ -20,7 +21,7 @@ def create_app() -> FastAPI:
     post_repository = PostRepository(pool)
     auth_service = AuthService(user_repository=user_repository, cfg=cfg)
     _ = PostService(post_repository=post_repository, cfg=cfg)
-    _ = UserService(user_repository=user_repository, cfg=cfg)
+    user_service = UserService(user_repository=user_repository, cfg=cfg)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -29,7 +30,9 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="GopherTalk", lifespan=lifespan)
     auth_router = AuthRouter(auth_service=auth_service)
+    user_router = UserRouter(user_service=user_service)
     app.include_router(auth_router.router)
+    app.include_router(user_router.router)
 
     return app
 
