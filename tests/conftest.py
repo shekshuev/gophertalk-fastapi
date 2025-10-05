@@ -6,6 +6,7 @@ from gophertalk_fastapi.config.config import Config
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 from gophertalk_fastapi.service.auth_service import AuthService
+from gophertalk_fastapi.service.user_service import UserService
 
 
 @pytest.fixture
@@ -126,3 +127,9 @@ def auth_service(mock_user_repository, mock_config):
         AuthService: Service instance ready for testing.
     """
     return AuthService(user_repository=mock_user_repository, cfg=mock_config)
+
+
+@pytest.fixture
+def user_service(mock_user_repository, mock_config):
+    """Provide a UserService instance with mocked dependencies."""
+    return UserService(user_repository=mock_user_repository, cfg=mock_config)

@@ -1,6 +1,6 @@
 from typing import Optional, Self
 
-from pydantic import field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic.dataclasses import dataclass
 
 from .validators import name_validator, password_validator, username_validator
@@ -35,12 +35,12 @@ class ReadAuthUserDataDto:
 
 @dataclass
 class UpdateUserDto:
-    user_name: str
-    first_name: str
-    last_name: str
-    password: str
-    password_confirm: str
-    password_hash: str
+    user_name: Optional[str] = Field(None)
+    first_name: Optional[str] = Field(None)
+    last_name: Optional[str] = Field(None)
+    password: Optional[str] = Field(None)
+    password_confirm: Optional[str] = Field(None)
+    password_hash: Optional[str] = Field(None)
 
     @field_validator("user_name", mode="after")
     @classmethod

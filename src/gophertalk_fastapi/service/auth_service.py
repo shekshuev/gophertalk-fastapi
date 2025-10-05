@@ -9,10 +9,19 @@ from ..models.user import CreateUserDto
 from ..repository.user_repository import UserRepository
 
 
-class WrongPasswordError(Exception): ...
+class WrongPasswordError(Exception):
+    """Raised when the provided password does not match the stored hash."""
+
+    ...
 
 
 class AuthService:
+    """
+    Service responsible for user authentication and token management.
+
+    Provides methods for user login, registration, and generation of JWT token pairs.
+    """
+
     def __init__(self, user_repository: UserRepository, cfg: Config):
         """
         Initialize the authentication service.
