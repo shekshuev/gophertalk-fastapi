@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import Field
@@ -35,7 +36,7 @@ class ReadPostDto:
     text: str
     user_id: int
     reply_to_id: Optional[int]
-    created_at: str
-    likes_count: int
-    views_count: int
-    user: ReadPostUserDto
+    created_at: datetime
+    likes_count: Optional[int] = Field(None)
+    views_count: Optional[int] = Field(None)
+    user: Optional[ReadPostUserDto] = Field(None)

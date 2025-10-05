@@ -2,7 +2,7 @@ import psycopg.errors
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
-from ..models.post import CreatePostDto, FilterPostDto, ReadPostDto
+from ..models.post import CreatePostDto, FilterPostDto, ReadPostDto, ReadPostUserDto
 
 
 class ReplyToPostDoesNotExistsError(Exception): ...
@@ -136,7 +136,27 @@ class PostRepository:
                 with conn.cursor(row_factory=dict_row) as cur:
                     cur.execute(query, params)
                     rows = cur.fetchall()
-                    return [ReadPostDto(**row) for row in rows]
+                    return [
+                        ReadPostDto(
+                            id=row["id"],
+                            text=row["text"],
+                            reply_to_id=row["reply_to_id"],
+                            created_at=row["created_at"],
+                            likes_count=row["likes_count"],
+                            views_count=row["views_count"],
+                            replies_count=row["replies_count"],
+                            user_liked=row["user_liked"],
+                            user_viewed=row["user_viewed"],
+                            user_id=row["user_id"],
+                            user=ReadPostUserDto(
+                                id=row["user_id"],
+                                user_name=row["user_name"],
+                                first_name=row["first_name"],
+                                last_name=row["last_name"],
+                            ),
+                        )
+                        for row in rows
+                    ]
         except psycopg.errors.Error as e:
             raise PostRepositoryError("Unknown error") from e
 
@@ -207,7 +227,24 @@ class PostRepository:
                     if row is None:
                         raise PostNotFoundError("Post not found")
 
-                    return ReadPostDto(**row)
+                    return ReadPostDto(
+                        id=row["post_id"],
+                        text=row["text"],
+                        reply_to_id=row["reply_to_id"],
+                        created_at=row["created_at"],
+                        likes_count=row["likes_count"],
+                        views_count=row["views_count"],
+                        replies_count=row["replies_count"],
+                        user_liked=row["user_liked"],
+                        user_viewed=row["user_viewed"],
+                        user_id=row["user_id"],
+                        user=ReadPostUserDto(
+                            id=row["user_id"],
+                            user_name=row["user_name"],
+                            first_name=row["first_name"],
+                            last_name=row["last_name"],
+                        ),
+                    )
         except psycopg.errors.Error as e:
             raise PostRepositoryError("Unknown error") from e
 
@@ -282,7 +319,7 @@ class PostRepository:
         """
         query = """
             INSERT INTO likes (post_id, user_id)
-            SELECT %s, %s
+            VALUES %s, %s
         """
 
         try:
