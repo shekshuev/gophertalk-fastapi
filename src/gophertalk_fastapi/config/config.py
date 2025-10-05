@@ -20,3 +20,4 @@ class Config:
     )
     access_token_secret: str = os.getenv("ACCESS_TOKEN_SECRET", "changeme")
     refresh_token_secret: str = os.getenv("REFRESH_TOKEN_SECRET", "changeme")
+    hash_algorithm: str = os.getenv("HASH_ALGORITHM", "HS256")

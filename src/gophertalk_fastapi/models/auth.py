@@ -58,3 +58,9 @@ class RegisterUserDto:
 class ReadTokenDto:
     access_token: str
     refresh_token: str
+
+
+@dataclass
+class TokenPayload:
+    sub: str
+    exp: int

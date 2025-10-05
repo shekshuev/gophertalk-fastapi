@@ -33,10 +33,14 @@ def test_login_success(auth_service, mock_user_repository, mock_config):
 
     assert isinstance(result, ReadTokenDto)
     decoded_access = jwt.decode(
-        result.access_token, mock_config.access_token_secret, algorithms=["HS256"]
+        result.access_token,
+        mock_config.access_token_secret,
+        algorithms=[mock_config.hash_algorithm],
     )
     decoded_refresh = jwt.decode(
-        result.refresh_token, mock_config.refresh_token_secret, algorithms=["HS256"]
+        result.refresh_token,
+        mock_config.refresh_token_secret,
+        algorithms=[mock_config.hash_algorithm],
     )
 
     assert decoded_access["sub"] == "1"
@@ -98,7 +102,9 @@ def test_register_success(auth_service, mock_user_repository):
 
     assert isinstance(result, ReadTokenDto)
     decoded_access = jwt.decode(
-        result.access_token, auth_service.cfg.access_token_secret, algorithms=["HS256"]
+        result.access_token,
+        auth_service.cfg.access_token_secret,
+        algorithms=[auth_service.cfg.hash_algorithm],
     )
     assert decoded_access["sub"] == "42"
 
@@ -135,10 +141,14 @@ def test_generate_token_pair_valid(auth_service, mock_config):
     assert isinstance(result, ReadTokenDto)
 
     decoded_access = jwt.decode(
-        result.access_token, mock_config.access_token_secret, algorithms=["HS256"]
+        result.access_token,
+        mock_config.access_token_secret,
+        algorithms=[mock_config.hash_algorithm],
     )
     decoded_refresh = jwt.decode(
-        result.refresh_token, mock_config.refresh_token_secret, algorithms=["HS256"]
+        result.refresh_token,
+        mock_config.refresh_token_secret,
+        algorithms=[mock_config.hash_algorithm],
     )
 
     assert decoded_access["sub"] == "99"

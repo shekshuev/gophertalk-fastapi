@@ -1,12 +1,18 @@
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
 import pytest
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
+from jose import jwt
 
 from gophertalk_fastapi.config.config import Config
+from gophertalk_fastapi.dependencies.auth import get_current_user
+from gophertalk_fastapi.models.auth import TokenPayload
 from gophertalk_fastapi.repository.post_repository import PostRepository
 from gophertalk_fastapi.repository.user_repository import UserRepository
 from gophertalk_fastapi.routers.auth_router import AuthRouter
+from gophertalk_fastapi.routers.post_router import PostRouter
 from gophertalk_fastapi.routers.user_router import UserRouter
 from gophertalk_fastapi.service.auth_service import AuthService
 from gophertalk_fastapi.service.post_service import PostService
@@ -59,6 +65,7 @@ def mock_config():
         refresh_token_secret="refresh_secret",
         access_token_expires=60,
         refresh_token_expires=3600,
+        hash_algorithm="HS256",
     )
 
 
@@ -281,7 +288,58 @@ def user_router(mock_user_service):
 
 
 @pytest.fixture
-def test_client(auth_router, user_router):
+def mock_post_service():
+    """
+    Provide a fully mocked `PostService` for isolated router testing.
+
+    This fixture creates a `MagicMock` instance that simulates the real
+    `PostService` used by the application. All key public methods
+    (`get_all_posts`, `create_post`, `delete_post`, `view_post`,
+    `like_post`, `dislike_post`) are pre-initialized as mocks, allowing
+    precise control over their behavior during tests.
+
+    It enables verification of the HTTP layer logic — including
+    authentication, validation, status codes, and exception handling —
+    without touching the actual database or repository implementations.
+
+    Returns:
+        MagicMock: A mocked `PostService` instance with preconfigured methods.
+    """
+    mock_service = MagicMock()
+    mock_service.get_all_posts = MagicMock()
+    mock_service.create_post = MagicMock()
+    mock_service.delete_post = MagicMock()
+    mock_service.view_post = MagicMock()
+    mock_service.like_post = MagicMock()
+    mock_service.dislike_post = MagicMock()
+    return mock_service
+
+
+@pytest.fixture
+def post_router(mock_post_service, mock_config):
+    """
+    Provide a `PostRouter` instance bound to a mocked `PostService`.
+
+    This fixture constructs the router that defines all `/posts` endpoints,
+    wiring it to a mocked `PostService` and test configuration object. It allows
+    HTTP route testing for posts — listing, creation, deletion, likes, views —
+    without any real database or external dependencies.
+
+    The `PostRouter` is registered under the `/posts` prefix and is ready for
+    inclusion into a FastAPI test app alongside other routers.
+
+    Args:
+        mock_post_service (MagicMock): The mocked post service used by the router.
+        mock_config (Config): Test configuration providing JWT secrets, DB params, etc.
+
+    Returns:
+        PostRouter: A fully initialized router instance exposing all `/posts` routes.
+    """
+    return PostRouter(post_service=mock_post_service, cfg=mock_config)
+
+
+@pytest.fixture
+def test_client(auth_router, user_router, post_router):
     """
     Provide a FastAPI `TestClient` configured with the authentication router.
 
@@ -301,9 +359,38 @@ def test_client(auth_router, user_router):
     Returns:
         TestClient: FastAPI testing client capable of issuing real HTTP calls to the in-memory app.
     """
-    from fastapi import FastAPI
 
     app = FastAPI()
     app.include_router(auth_router.router)
     app.include_router(user_router.router)
+    app.include_router(post_router.router)
+    return TestClient(app)
+
+
+@pytest.fixture
+def valid_token(mock_config):
+    """Generate a valid JWT for testing."""
+    exp_time = datetime.now(UTC) + timedelta(minutes=5)
+    payload = {"sub": "42", "type": "access", "exp": exp_time}
+    token = jwt.encode(
+        payload, mock_config.access_token_secret, algorithm=mock_config.hash_algorithm
+    )
+    return token
+
+
+@pytest.fixture
+def invalid_token():
+    """Provide an invalid JWT (wrong signature)."""
+    return "invalid.token.value"
+
+
+@pytest.fixture
+def test_app_for_auth_dependencies(mock_config):
+    """Create a minimal FastAPI app for dependency testing."""
+    app = FastAPI()
+
+    @app.get("/protected")
+    def protected_route(user: TokenPayload = Depends(get_current_user(mock_config))):
+        return {"user_id": user.sub}
+
     return TestClient(app)

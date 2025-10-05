@@ -102,7 +102,7 @@ class AuthService:
                 "exp": now + timedelta(seconds=self.cfg.access_token_expires),
             },
             self.cfg.access_token_secret,
-            algorithm="HS256",
+            algorithm=self.cfg.hash_algorithm,
         )
 
         refresh_token = jwt.encode(
@@ -111,7 +111,7 @@ class AuthService:
                 "exp": now + timedelta(seconds=self.cfg.refresh_token_expires),
             },
             self.cfg.refresh_token_secret,
-            algorithm="HS256",
+            algorithm=self.cfg.hash_algorithm,
         )
 
         return ReadTokenDto(access_token=access_token, refresh_token=refresh_token)
