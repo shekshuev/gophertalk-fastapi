@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 
 from gophertalk_fastapi.config.config import Config
@@ -13,6 +14,8 @@ from gophertalk_fastapi.routers.user_router import UserRouter
 from gophertalk_fastapi.service.auth_service import AuthService
 from gophertalk_fastapi.service.post_service import PostService
 from gophertalk_fastapi.service.user_service import UserService
+
+load_dotenv()
 
 
 def create_app() -> FastAPI:
