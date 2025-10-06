@@ -96,10 +96,13 @@ class AuthService:
         """
         now = datetime.now(UTC)
 
+        print(self.cfg)
+
         access_token = jwt.encode(
             {
                 "sub": str(user_id),
                 "exp": now + timedelta(seconds=self.cfg.access_token_expires),
+                "type": "access",
             },
             self.cfg.access_token_secret,
             algorithm=self.cfg.hash_algorithm,
@@ -109,6 +112,7 @@ class AuthService:
             {
                 "sub": str(user_id),
                 "exp": now + timedelta(seconds=self.cfg.refresh_token_expires),
+                "type": "refresh",
             },
             self.cfg.refresh_token_secret,
             algorithm=self.cfg.hash_algorithm,

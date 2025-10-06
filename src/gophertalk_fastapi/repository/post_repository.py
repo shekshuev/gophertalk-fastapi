@@ -372,7 +372,7 @@ class PostRepository:
         """
         query = """
             INSERT INTO likes (post_id, user_id)
-            VALUES %s, %s
+            VALUES (%s, %s)
         """
 
         try:
@@ -384,9 +384,9 @@ class PostRepository:
         except psycopg.errors.UniqueViolation as e:
             if "pk__likes" in str(e):
                 raise PostAlreadyLikedError("Post already liked") from e
-            raise PostRepositoryError("Unknown error") from e
+            raise PostRepositoryError(str(e)) from e
         except psycopg.errors.Error as e:
-            raise PostRepositoryError("Unknown error") from e
+            raise PostRepositoryError(str(e)) from e
 
     def dislike_post(self, post_id: int, user_id: int) -> None:
         """

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Response, status
 
 from ..config.config import Config
 from ..dependencies.auth import get_current_user
@@ -141,6 +141,7 @@ class PostRouter:
             """
             try:
                 self.post_service.view_post(post_id, user.sub)
+                return Response(status_code=status.HTTP_201_CREATED)
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
@@ -162,6 +163,7 @@ class PostRouter:
             """
             try:
                 self.post_service.like_post(post_id, user.sub)
+                return Response(status_code=status.HTTP_201_CREATED)
             except Exception as e:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
