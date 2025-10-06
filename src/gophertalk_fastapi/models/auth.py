@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Optional
 
 from pydantic import Field, field_validator, model_validator
 from pydantic.dataclasses import dataclass
@@ -48,7 +48,7 @@ class RegisterUserDto:
         return name_validator(value)
 
     @model_validator(mode="after")
-    def check_passwords_match(self) -> Self:
+    def check_passwords_match(self):
         if self.password != self.password_confirm:
             raise ValueError("Passwords does not match")
         return self

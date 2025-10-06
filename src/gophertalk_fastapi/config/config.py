@@ -11,6 +11,8 @@ class Config:
     database_name: str = os.getenv("DATABASE_NAME", "gophertalk")
     database_user: str = os.getenv("DATABASE_USER", "gophertalk")
     database_password: str = os.getenv("DATABASE_PASSWORD", "gophertalk")
+    database_min_pool_size: int = os.getenv("DATABASE_MIN_POOL_SIZE", 4)
+    database_max_pool_size: int = os.getenv("DATABASE_MAX_POOL_SIZE", 10)
     access_token_expires: int = int(os.getenv("ACCESS_TOKEN_EXPIRES", 3600))
     refresh_token_expires: int = int(os.getenv("REFRESH_TOKEN_EXPIRES", 86400))
     access_token_secret: str = os.getenv("ACCESS_TOKEN_SECRET", "changeme")

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import timezone, datetime, timedelta
 from unittest.mock import MagicMock
 
 import pytest
@@ -66,6 +66,8 @@ def mock_config():
         access_token_expires=60,
         refresh_token_expires=3600,
         hash_algorithm="HS256",
+        database_min_pool_size=4,
+        database_max_pool_size=10
     )
 
 
@@ -370,7 +372,7 @@ def test_client(auth_router, user_router, post_router):
 @pytest.fixture
 def valid_token(mock_config):
     """Generate a valid JWT for testing."""
-    exp_time = datetime.now(UTC) + timedelta(minutes=5)
+    exp_time = datetime.now(timezone.utc)+ timedelta(minutes=5)
     payload = {"sub": "42", "type": "access", "exp": exp_time}
     token = jwt.encode(
         payload, mock_config.access_token_secret, algorithm=mock_config.hash_algorithm

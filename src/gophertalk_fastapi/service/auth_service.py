@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from jose import jwt
@@ -94,7 +94,7 @@ class AuthService:
             - Access Token: Short-lived (used for API requests).
             - Refresh Token: Longer-lived (used to obtain new access tokens).
         """
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
 
         print(self.cfg)
 

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import timezone, datetime
 
 from fastapi import status
 
@@ -28,7 +28,7 @@ def test_get_all_posts_success(test_client, mock_post_service, valid_token):
             text="Hello world!",
             user_id=1,
             reply_to_id=None,
-            created_at=datetime.now(UTC),
+            created_at=datetime.now(timezone.utc),
             likes_count=5,
             views_count=2,
             user=ReadPostUserDto(
@@ -80,7 +80,7 @@ def test_create_post_success(test_client, mock_post_service, valid_token):
         text="My first post",
         user_id=42,
         reply_to_id=None,
-        created_at=datetime.now(UTC),
+        created_at=datetime.now(timezone.utc),
         likes_count=0,
         views_count=0,
         user=ReadPostUserDto(

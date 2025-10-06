@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import timezone, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -103,7 +103,7 @@ def test_read_post_dto_valid_with_nested_user():
         text="Hello!",
         user_id=42,
         reply_to_id=None,
-        created_at=datetime.now(UTC),
+        created_at=datetime.now(timezone.utc),
         likes_count=5,
         views_count=100,
         user=user,
@@ -123,5 +123,5 @@ def test_read_post_dto_missing_required_field():
             text=None,
             user_id=42,
             reply_to_id=None,
-            created_at=datetime.now(UTC),
+            created_at=datetime.now(timezone.utc),
         )
